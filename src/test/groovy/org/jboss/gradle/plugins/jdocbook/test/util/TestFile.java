@@ -29,12 +29,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.gradle.api.UncheckedIOException;
-import org.gradle.api.file.DeleteAction;
-import org.gradle.api.internal.file.IdentityFileResolver;
-import org.gradle.api.internal.file.copy.DeleteActionImpl;
 import org.gradle.util.AntUtil;
 import org.gradle.util.GFileUtils;
-import org.gradle.util.hash.HashUtil;
 import org.hamcrest.Matcher;
 
 import java.io.*;
@@ -88,7 +84,7 @@ public class TestFile extends File implements TestFileContext {
         for (Object p : path) {
             current = new File(current, p.toString());
         }
-        return GFileUtils.canonicalise(current);
+        return current;
     }
 
     public TestFile file(Object... path) {
@@ -363,8 +359,7 @@ public class TestFile extends File implements TestFileContext {
     }
 
     public TestFile deleteDir() {
-        DeleteAction delete = new DeleteActionImpl(new IdentityFileResolver());
-        delete.delete(this);
+        GFileUtils.deleteQuietly(this);
         return this;
     }
 
@@ -413,16 +408,16 @@ public class TestFile extends File implements TestFileContext {
         return new Snapshot();
     }
 
-    public void assertHasChangedSince(Snapshot snapshot) {
-        Snapshot now = snapshot();
-        assertTrue(now.modTime != snapshot.modTime || !Arrays.equals(now.hash, snapshot.hash));
-    }
-
-    public void assertHasNotChangedSince(Snapshot snapshot) {
-        Snapshot now = snapshot();
-        assertEquals(String.format("last modified time of %s has changed", this), snapshot.modTime, now.modTime);
-        assertArrayEquals(String.format("contents of %s has changed", this), snapshot.hash, now.hash);
-    }
+    //public void assertHasChangedSince(Snapshot snapshot) {
+    //    Snapshot now = snapshot();
+    //    assertTrue(now.modTime != snapshot.modTime || !Arrays.equals(now.hash, snapshot.hash));
+    //}
+    //
+    //public void assertHasNotChangedSince(Snapshot snapshot) {
+    //    Snapshot now = snapshot();
+    //    assertEquals(String.format("last modified time of %s has changed", this), snapshot.modTime, now.modTime);
+    //    assertArrayEquals(String.format("contents of %s has changed", this), snapshot.hash, now.hash);
+    //}
 
     public void writeProperties(Map<?, ?> properties) {
         Properties props = new Properties();
@@ -441,11 +436,11 @@ public class TestFile extends File implements TestFileContext {
 
     public class Snapshot {
         private final long modTime;
-        private final byte[] hash;
+        //private final byte[] hash;
 
         public Snapshot() {
             modTime = lastModified();
-            hash = HashUtil.createHash(TestFile.this,"MD5").asByteArray();
+            //hash = HashUtil.createHash(TestFile.this,"MD5").asByteArray();
         }
     }
 }

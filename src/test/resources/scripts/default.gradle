@@ -31,19 +31,16 @@
 jdocbook {
     masterSourceDocumentName = 'HIBERNATE_-_Relational_Persistence_for_Idiomatic_Java.xml'
     translations = ['zh-CN']
-    format {
-        name = 'html_single'
+    format('html_single') {
         finalName = 'index.html'
         stylesheet = "classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl"
     }
     transformerParameters = ["a":"b"]
-    format {
-        name = 'html'
+    format('html') {
         finalName = 'index.html'
         stylesheet = "classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl"
     }
-    format {
-        name = 'pdf'
+    format('pdf') {
         finalName = "hibernate_reference.pdf"
         stylesheet = "classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl"
     }

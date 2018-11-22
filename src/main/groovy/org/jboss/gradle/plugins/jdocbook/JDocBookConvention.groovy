@@ -23,13 +23,15 @@
  */
 package org.jboss.gradle.plugins.jdocbook
 
+import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.listener.ActionBroadcast
+import org.gradle.internal.Actions
 import org.jboss.gradle.plugins.jdocbook.book.Book
 import org.jboss.gradle.plugins.jdocbook.book.BookConfiguration
+import org.jboss.gradle.plugins.jdocbook.task.CreateTasksPerBookAction
 
 /**
  * The top-level convention object exposed to the Gradle build for jDocBook configuration
@@ -43,7 +45,7 @@ class JDocBookConvention {
     @Delegate
     BookConfiguration bookConfiguration;
     Project project
-    ActionBroadcast<Book> configBookActions = new ActionBroadcast<Book>();
+    Action<Book>  configBookActions
 
     JDocBookConvention(Project project, NamedDomainObjectContainer<Book> books) {
         this.project = project
@@ -70,7 +72,7 @@ class JDocBookConvention {
             }
             commonBook.concrete = false
         }
-
+        configBookActions = new CreateTasksPerBookAction( project )
     }
 
     /**

@@ -46,9 +46,10 @@ class AbstractJDocbookSpock extends Specification {
 
     def setup() {
         project = HelperUtil.createRootProject(new File("build/tmp/tests/" + this.getClass().getSimpleName()))
-        project.getLogging().setLevel(LogLevel.DEBUG)
+        project.getLogging().captureStandardOutput(LogLevel.DEBUG)
+        project.getLogging().captureStandardError(LogLevel.DEBUG)
         plugin = project.plugins.apply(JDocBookPlugin)
-        convention = project.convention.plugins.jdocbook
+        convention = project.convention.plugins.get("jdocbook")
     }
 
     def cleanup() {
@@ -62,8 +63,10 @@ class AbstractJDocbookSpock extends Specification {
     def applyRepositories() {
         project.repositories {
             mavenCentral()
-            mavenRepo name: "mavenCache", urls: "file://" + System.getProperty('user.home') + "/.m2/repository/"
-            mavenRepo name: "jboss", urls: "http://repository.jboss.org/nexus/content/groups/public/"
+            mavenLocal()
+            maven {
+                url "http://repository.jboss.org/nexus/content/groups/public/"
+            }
         }
     }
 

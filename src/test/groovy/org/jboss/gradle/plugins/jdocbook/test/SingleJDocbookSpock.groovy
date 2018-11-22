@@ -26,6 +26,11 @@
 
 package org.jboss.gradle.plugins.jdocbook.test
 
+import org.gradle.api.Task
+import org.junit.Assert
+
+import java.util.function.Predicate
+
 /**
  *
  * @author: Strong Liu
@@ -35,11 +40,14 @@ class SingleJDocbookSpock extends AbstractJDocbookSpock {
 
     def "check if tasks are well configured"() {
         applyScript DEFAULT_SCRIPT
+        applyRepositories()
+        applyJDocbookStyle()
         expect:
         project.tasks.all {
             println it.name
         }
-        project.tasks.buildDocs.execute()
+        def mainTask = project.tasks.findByName("buildDocs")
+        Assert.assertNotNull("missing buildDocs", mainTask)
     }
 
     def "make sure compatibility does not broken"() {

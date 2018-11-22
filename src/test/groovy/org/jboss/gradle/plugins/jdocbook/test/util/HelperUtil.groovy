@@ -26,6 +26,12 @@
 
 package org.jboss.gradle.plugins.jdocbook.test.util
 
+import org.gradle.api.Project
+import org.gradle.api.internal.ClassGenerator
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
+import org.gradle.api.internal.project.DefaultProject
+
 import java.rmi.server.UID
 import org.apache.ivy.core.module.descriptor.Configuration
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor
@@ -40,22 +46,11 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.gradle.BuildResult
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ModuleDependency
-import org.gradle.api.internal.AsmBackedClassGenerator
-import org.gradle.api.internal.ClassGenerator
-import org.gradle.api.internal.artifacts.configurations.DefaultConfiguration
-import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
-import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
-import org.gradle.api.internal.project.DefaultProject
-import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.api.internal.project.taskfactory.AnnotationProcessingTaskFactory
-import org.gradle.api.internal.project.taskfactory.ITaskFactory
-import org.gradle.api.internal.project.taskfactory.TaskFactory
 import org.gradle.api.specs.AndSpec
 import org.gradle.api.specs.Spec
 import org.gradle.groovy.scripts.DefaultScript
 import org.gradle.groovy.scripts.Script
 import org.gradle.groovy.scripts.ScriptSource
-import org.gradle.groovy.scripts.StringScriptSource
 import org.gradle.testfixtures.ProjectBuilder
 
 /**
@@ -65,42 +60,21 @@ class HelperUtil {
 
     public static final Closure TEST_CLOSURE = {}
     public static final Spec TEST_SEPC = new AndSpec()
-    private static final ClassGenerator CLASS_GENERATOR = new AsmBackedClassGenerator()
-    private static final ITaskFactory TASK_FACTORY = new AnnotationProcessingTaskFactory(new TaskFactory(CLASS_GENERATOR))
 
-    static <T extends Task> T createTask(Class<T> type) {
-        return createTask(type, createRootProject())
-    }
-
-    static <T extends Task> T createTask(Class<T> type, ProjectInternal project) {
-        return createTask(type, project, 'name')
-    }
-
-    static <T extends Task> T createTask(Class<T> type, ProjectInternal project, String name) {
-        return TASK_FACTORY.createTask(project, [name: name, type: type])
-    }
-
-    static DefaultProject createRootProject() {
+    static Project createRootProject() {
         createRootProject(TemporaryFolder.newInstance().dir)
     }
 
-    static DefaultProject createRootProject(File rootDir) {
+    static Project createRootProject(File rootDir) {
         return ProjectBuilder.builder().withProjectDir(rootDir).build()
     }
 
-    static DefaultProject createChildProject(DefaultProject parentProject, String name, File projectDir = null) {
-        DefaultProject project = CLASS_GENERATOR.newInstance(
-                DefaultProject.class,
-                name,
-                parentProject,
-                projectDir ?: new File(parentProject.getProjectDir(), name),
-                new StringScriptSource("test build file", null),
-                parentProject.gradle,
-                parentProject.gradle.services
-        )
-        parentProject.addChildProject project
-        parentProject.projectRegistry.addProject project
-        return project
+    static Project createChildProject(Project parentProject, String name, File projectDir = null) {
+        return ProjectBuilder.builder()
+                .withName(name)
+                .withParent(parentProject)
+                .withProjectDir(projectDir)
+                .build()
     }
 
     static def pureStringTransform(def collection) {
@@ -179,9 +153,9 @@ class HelperUtil {
         return new UID().toString();
     }
 
-    static org.gradle.api.artifacts.Configuration createConfiguration(String name) {
-        return new DefaultConfiguration(name, name, null, null)
-    }
+   //static org.gradle.api.artifacts.Configuration createConfiguration(String name) {
+   //    return new DefaultConfiguration(name, name, null, null)
+   //}
 }
 
 public interface TestClosure {

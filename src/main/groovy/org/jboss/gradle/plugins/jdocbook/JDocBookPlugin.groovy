@@ -48,7 +48,6 @@ public class JDocBookPlugin implements Plugin<Project> {
         def books = project.container(Book) { String name -> new Book( name, project ) }
         JDocBookConvention convention = new JDocBookConvention( project, books )
         project.convention.plugins.put( DOCBOOK_CONFIG_NAME, convention )
-        convention.configBookActions.add( new CreateTasksPerBookAction( project ) )
     }
 
     private static void applyConfiguration(Project project) {

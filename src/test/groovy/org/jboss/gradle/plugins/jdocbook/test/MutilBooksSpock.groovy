@@ -52,10 +52,7 @@ class MutilBooksSpock extends AbstractJDocbookSpock {
         tasks.all {
             println " ---> task ($name) "
         }
-        //tasks.getByName('renderDocBook_devguide_en-US_html').execute()
-//		List list = new ArrayList()
-//		list.add(tasks.buildDocs)
-//		project.getGradle().getTaskGraph().execute(list)
+        tasks.getByName('renderDocBook_devguide_en-US_html').execute()
         tasks."renderDocBook_devguide_en-US_html".getOutputs().getHasOutput()
 
     }
@@ -63,7 +60,7 @@ class MutilBooksSpock extends AbstractJDocbookSpock {
 
 
 
-    def "mutil books configure support"() {
+    def "multi books configure support"() {
         applyScript DEFAULT_SCRIPT
         expect:
         convention != null
